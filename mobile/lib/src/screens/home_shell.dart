@@ -6,19 +6,14 @@ import 'exams_screen.dart';
 import 'menu_screen.dart';
 import 'notifications_screen.dart';
 import 'packages_screen.dart';
+import 'courses_screen.dart';
+import 'bookmarks_screen.dart';
+import 'streak_screen.dart';
+import 'certificates_screen.dart';
+import 'leaderboard_screen.dart';
 import 'profile_screen.dart';
 import 'results_screen.dart';
-
-enum _ShellScreen {
-  dashboard,
-  exams,
-  results,
-  notifications,
-  packages,
-  menu,
-  enquiries,
-  profile,
-}
+import '../navigation/app_section.dart';
 
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key});
@@ -28,16 +23,16 @@ class HomeShell extends StatefulWidget {
 }
 
 class _HomeShellState extends State<HomeShell> {
-  _ShellScreen _activeScreen = _ShellScreen.dashboard;
-  _ShellScreen _primaryTab = _ShellScreen.dashboard;
+  AppSection _activeSection = AppSection.dashboard;
+  AppSection _primaryTab = AppSection.dashboard;
 
-  void _openScreen(_ShellScreen screen) {
+  void _openSection(AppSection section) {
     setState(() {
-      _activeScreen = screen;
-      if (screen == _ShellScreen.dashboard ||
-          screen == _ShellScreen.exams ||
-          screen == _ShellScreen.profile) {
-        _primaryTab = screen;
+      _activeSection = section;
+      if (section == AppSection.dashboard ||
+          section == AppSection.exams ||
+          section == AppSection.profile) {
+        _primaryTab = section;
       }
     });
     Navigator.of(context).maybePop();
@@ -45,27 +40,37 @@ class _HomeShellState extends State<HomeShell> {
 
   int get _bottomIndex {
     return switch (_primaryTab) {
-      _ShellScreen.dashboard => 0,
-      _ShellScreen.exams => 1,
-      _ShellScreen.profile => 2,
-      _ShellScreen.results ||
-      _ShellScreen.notifications ||
-      _ShellScreen.packages ||
-      _ShellScreen.menu ||
-      _ShellScreen.enquiries => 0,
+      AppSection.dashboard => 0,
+      AppSection.exams => 1,
+      AppSection.profile => 2,
+      AppSection.results ||
+      AppSection.notifications ||
+      AppSection.packages ||
+      AppSection.menu ||
+      AppSection.enquiries ||
+      AppSection.courses ||
+      AppSection.bookmarks ||
+      AppSection.streak ||
+      AppSection.certificates ||
+      AppSection.leaderboard => 0,
     };
   }
 
   Widget _buildScreen() {
-    return switch (_activeScreen) {
-      _ShellScreen.dashboard => const DashboardScreen(),
-      _ShellScreen.exams => const ExamsScreen(),
-      _ShellScreen.results => const ResultsScreen(),
-      _ShellScreen.notifications => const NotificationsScreen(),
-      _ShellScreen.packages => const PackagesScreen(),
-      _ShellScreen.menu => const MenuScreen(),
-      _ShellScreen.enquiries => const EnquiriesScreen(),
-      _ShellScreen.profile => const ProfileScreen(),
+    return switch (_activeSection) {
+      AppSection.dashboard => DashboardScreen(onNavigate: _openSection),
+      AppSection.exams => const ExamsScreen(),
+      AppSection.results => const ResultsScreen(),
+      AppSection.notifications => const NotificationsScreen(),
+      AppSection.packages => const PackagesScreen(),
+      AppSection.menu => const MenuScreen(),
+      AppSection.enquiries => const EnquiriesScreen(),
+      AppSection.profile => const ProfileScreen(),
+      AppSection.courses => const CoursesScreen(),
+      AppSection.bookmarks => const BookmarksScreen(),
+      AppSection.streak => const StreakScreen(),
+      AppSection.certificates => const CertificatesScreen(),
+      AppSection.leaderboard => const LeaderboardScreen(),
     };
   }
 
@@ -97,32 +102,62 @@ class _HomeShellState extends State<HomeShell> {
               _DrawerItem(
                 icon: Icons.insights_outlined,
                 label: 'Results',
-                selected: _activeScreen == _ShellScreen.results,
-                onTap: () => _openScreen(_ShellScreen.results),
+                selected: _activeSection == AppSection.results,
+                onTap: () => _openSection(AppSection.results),
               ),
               _DrawerItem(
                 icon: Icons.notifications_none_outlined,
                 label: 'Notifications',
-                selected: _activeScreen == _ShellScreen.notifications,
-                onTap: () => _openScreen(_ShellScreen.notifications),
+                selected: _activeSection == AppSection.notifications,
+                onTap: () => _openSection(AppSection.notifications),
               ),
               _DrawerItem(
                 icon: Icons.workspace_premium_outlined,
                 label: 'Packages',
-                selected: _activeScreen == _ShellScreen.packages,
-                onTap: () => _openScreen(_ShellScreen.packages),
+                selected: _activeSection == AppSection.packages,
+                onTap: () => _openSection(AppSection.packages),
               ),
               _DrawerItem(
                 icon: Icons.menu_book_outlined,
                 label: 'Menu',
-                selected: _activeScreen == _ShellScreen.menu,
-                onTap: () => _openScreen(_ShellScreen.menu),
+                selected: _activeSection == AppSection.menu,
+                onTap: () => _openSection(AppSection.menu),
               ),
               _DrawerItem(
                 icon: Icons.forum_outlined,
                 label: 'Enquiries',
-                selected: _activeScreen == _ShellScreen.enquiries,
-                onTap: () => _openScreen(_ShellScreen.enquiries),
+                selected: _activeSection == AppSection.enquiries,
+                onTap: () => _openSection(AppSection.enquiries),
+              ),
+              _DrawerItem(
+                icon: Icons.menu_book,
+                label: 'Courses',
+                selected: _activeSection == AppSection.courses,
+                onTap: () => _openSection(AppSection.courses),
+              ),
+              _DrawerItem(
+                icon: Icons.bookmark_outline,
+                label: 'Bookmarks',
+                selected: _activeSection == AppSection.bookmarks,
+                onTap: () => _openSection(AppSection.bookmarks),
+              ),
+              _DrawerItem(
+                icon: Icons.local_fire_department_outlined,
+                label: 'Practice Streak',
+                selected: _activeSection == AppSection.streak,
+                onTap: () => _openSection(AppSection.streak),
+              ),
+              _DrawerItem(
+                icon: Icons.workspace_premium,
+                label: 'Certificates',
+                selected: _activeSection == AppSection.certificates,
+                onTap: () => _openSection(AppSection.certificates),
+              ),
+              _DrawerItem(
+                icon: Icons.emoji_events_outlined,
+                label: 'Leaderboard',
+                selected: _activeSection == AppSection.leaderboard,
+                onTap: () => _openSection(AppSection.leaderboard),
               ),
               const Spacer(),
               Padding(
@@ -143,9 +178,9 @@ class _HomeShellState extends State<HomeShell> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _bottomIndex,
         onDestinationSelected: (value) {
-          if (value == 0) _openScreen(_ShellScreen.dashboard);
-          if (value == 1) _openScreen(_ShellScreen.exams);
-          if (value == 2) _openScreen(_ShellScreen.profile);
+          if (value == 0) _openSection(AppSection.dashboard);
+          if (value == 1) _openSection(AppSection.exams);
+          if (value == 2) _openSection(AppSection.profile);
         },
         destinations: const [
           NavigationDestination(

@@ -1,0 +1,15 @@
+enum AppSection {
+  dashboard,
+  exams,
+  results,
+  notifications,
+  packages,
+  menu,
+  enquiries,
+  profile,
+  courses,
+  bookmarks,
+  streak,
+  certificates,
+  leaderboard,
+}

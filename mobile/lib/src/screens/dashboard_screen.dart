@@ -2,14 +2,32 @@ import 'package:flutter/material.dart';
 
 import '../data/mock_exam_repository.dart';
 import '../models/app_models.dart';
+import '../navigation/app_section.dart';
 
 class DashboardScreen extends StatelessWidget {
-  const DashboardScreen({super.key});
+  const DashboardScreen({
+    super.key,
+    required this.onNavigate,
+  });
+
+  final ValueChanged<AppSection> onNavigate;
 
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final repo = MockExamRepository.instance;
+    const destinations = <AppSection>[
+      AppSection.exams,
+      AppSection.packages,
+      AppSection.results,
+      AppSection.leaderboard,
+      AppSection.courses,
+      AppSection.bookmarks,
+      AppSection.streak,
+      AppSection.notifications,
+      AppSection.enquiries,
+      AppSection.certificates,
+    ];
 
     return FutureBuilder<List<SummaryStat>>(
       future: repo.loadStats(),
@@ -45,7 +63,10 @@ class DashboardScreen extends StatelessWidget {
                   ),
                   itemBuilder: (context, index) {
                     final stat = stats[index];
-                    return _StatTile(stat: stat);
+                    return _StatTile(
+                      stat: stat,
+                      onTap: () => onNavigate(destinations[index]),
+                    );
                   },
                 ),
               ],
@@ -107,33 +128,44 @@ class _HeroHeader extends StatelessWidget {
 }
 
 class _StatTile extends StatelessWidget {
-  const _StatTile({required this.stat});
+  const _StatTile({
+    required this.stat,
+    required this.onTap,
+  });
 
   final SummaryStat stat;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: stat.accent.withValues(alpha: 0.12),
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: stat.accent.withValues(alpha: 0.20)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Icon(stat.icon, color: stat.accent),
-          Column(
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: stat.accent.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(22),
+            border: Border.all(color: stat.accent.withValues(alpha: 0.20)),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(stat.value, style: Theme.of(context).textTheme.headlineMedium),
-              const SizedBox(height: 4),
-              Text(stat.label, style: Theme.of(context).textTheme.bodyMedium),
+              Icon(stat.icon, color: stat.accent),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(stat.value, style: Theme.of(context).textTheme.headlineMedium),
+                  const SizedBox(height: 4),
+                  Text(stat.label, style: Theme.of(context).textTheme.bodyMedium),
+                ],
+              ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }
