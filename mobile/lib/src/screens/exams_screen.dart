@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/mock_exam_repository.dart';
 import '../models/app_models.dart';
 import '../widgets/section_card.dart';
+import 'exam_attempt_screen.dart';
 
 class ExamsScreen extends StatelessWidget {
   const ExamsScreen({super.key});
@@ -17,7 +18,7 @@ class ExamsScreen extends StatelessWidget {
         children: [
           Text('Exams', style: Theme.of(context).textTheme.headlineLarge),
           const SizedBox(height: 8),
-          Text('Browse practice, mock, and live tests with exam timing and question counts.'),
+          const Text('Browse practice, mock, and live tests with exam timing and question counts.'),
           const SizedBox(height: 18),
           FutureBuilder<List<ExamCardData>>(
             future: repo.loadExams(),
@@ -80,7 +81,7 @@ class _ExamCard extends StatelessWidget {
                     children: [
                       Text(exam.title, style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 6),
-                      Text('${exam.category} • ${exam.mode}'),
+                      Text('${exam.category} - ${exam.mode}'),
                     ],
                   ),
                 ),
@@ -104,7 +105,15 @@ class _ExamCard extends StatelessWidget {
             Text('Starts: ${exam.startsAt}'),
             const SizedBox(height: 12),
             FilledButton(
-              onPressed: exam.isLocked ? null : () {},
+              onPressed: exam.isLocked
+                  ? null
+                  : () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => ExamAttemptScreen(exam: exam),
+                        ),
+                      );
+                    },
               child: Text(exam.isLocked ? 'Locked package' : 'Start now'),
             ),
           ],
