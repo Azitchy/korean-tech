@@ -10,8 +10,8 @@ class MockExamRepository {
   final List<SummaryStat> _stats = const [
     SummaryStat(label: 'Available Exams', value: '24', icon: Icons.assignment_turned_in, accent: Color(0xFF0EA5A4)),
     SummaryStat(label: 'Purchased Package', value: 'Premium', icon: Icons.workspace_premium, accent: Color(0xFFF97316)),
-    SummaryStat(label: 'Active Courses', value: '10', icon: Icons.menu_book, accent: Color(0xFF14B8A6)),
-    SummaryStat(label: 'Gallery', value: '10', icon: Icons.photo_library_outlined, accent: Color(0xFF6366F1)),
+    SummaryStat(label: 'EPS Books', value: '10', icon: Icons.menu_book, accent: Color(0xFF14B8A6)),
+    SummaryStat(label: 'All Courses', value: '10', icon: Icons.photo_library_outlined, accent: Color(0xFF6366F1)),
   ];
 
   final List<DashboardNotification> _notifications = const [
