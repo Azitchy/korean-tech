@@ -17,7 +17,7 @@ class EnquiriesScreen extends StatelessWidget {
         children: [
           Text('Enquiries', style: Theme.of(context).textTheme.headlineLarge),
           const SizedBox(height: 8),
-          Text('Ask teachers questions and follow the reply history.'),
+          const Text('Ask teachers questions and follow the reply history.'),
           const SizedBox(height: 18),
           FutureBuilder<List<EnquiryThread>>(
             future: repo.loadEnquiries(),
@@ -68,8 +68,8 @@ class _ThreadCard extends StatelessWidget {
                 Chip(
                   label: Text(thread.status),
                   backgroundColor: thread.status == 'Answered'
-                      ? scheme.primary.withOpacity(0.14)
-                      : scheme.secondary.withOpacity(0.14),
+                      ? scheme.primary.withValues(alpha: 0.14)
+                      : scheme.secondary.withValues(alpha: 0.14),
                 ),
               ],
             ),
@@ -91,13 +91,13 @@ class _QuickMessageForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        TextField(
-          decoration: const InputDecoration(labelText: 'Subject', border: OutlineInputBorder()),
+        const TextField(
+          decoration: InputDecoration(labelText: 'Subject', border: OutlineInputBorder()),
         ),
         const SizedBox(height: 12),
-        TextField(
+        const TextField(
           maxLines: 4,
-          decoration: const InputDecoration(labelText: 'Message', border: OutlineInputBorder()),
+          decoration: InputDecoration(labelText: 'Message', border: OutlineInputBorder()),
         ),
         const SizedBox(height: 12),
         SizedBox(

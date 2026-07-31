@@ -26,15 +26,15 @@ class ExamApp extends StatelessWidget {
           foregroundColor: scheme.onSurface,
           centerTitle: false,
         ),
-        cardTheme: CardTheme(
-          color: scheme.surfaceContainerHighest.withOpacity(0.72),
+        cardTheme: CardThemeData(
+          color: scheme.surfaceContainerHighest.withValues(alpha: 0.72),
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         ),
         navigationBarTheme: NavigationBarThemeData(
-          backgroundColor: scheme.surface.withOpacity(0.95),
-          indicatorColor: scheme.primary.withOpacity(0.18),
-          labelTextStyle: MaterialStatePropertyAll(
+          backgroundColor: scheme.surface.withValues(alpha: 0.95),
+          indicatorColor: scheme.primary.withValues(alpha: 0.18),
+          labelTextStyle: WidgetStatePropertyAll(
             TextStyle(color: scheme.onSurfaceVariant, fontWeight: FontWeight.w600),
           ),
         ),

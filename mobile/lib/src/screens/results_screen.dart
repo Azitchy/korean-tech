@@ -94,8 +94,8 @@ class _ResultCard extends StatelessWidget {
                 Chip(
                   label: Text(result.status),
                   backgroundColor: result.status == 'PASS'
-                      ? scheme.primary.withOpacity(0.14)
-                      : scheme.tertiary.withOpacity(0.14),
+                      ? scheme.primary.withValues(alpha: 0.14)
+                      : scheme.tertiary.withValues(alpha: 0.14),
                 ),
               ],
             ),

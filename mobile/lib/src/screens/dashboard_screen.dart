@@ -29,7 +29,7 @@ class DashboardScreen extends StatelessWidget {
               begin: Alignment.topCenter,
               end: Alignment.bottomCenter,
               colors: [
-                scheme.primary.withOpacity(0.12),
+                scheme.primary.withValues(alpha: 0.12),
                 scheme.surface,
               ],
             ),
@@ -124,7 +124,7 @@ class _HeroHeader extends StatelessWidget {
           Text(
             'Prepare for IELTS, TOEFL, SAT and more with instant results, listening tests, and teacher support.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: scheme.onPrimary.withOpacity(0.88),
+                  color: scheme.onPrimary.withValues(alpha: 0.88),
                 ),
           ),
           const SizedBox(height: 16),
@@ -152,9 +152,9 @@ class _StatTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: stat.accent.withOpacity(0.12),
+        color: stat.accent.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: stat.accent.withOpacity(0.20)),
+        border: Border.all(color: stat.accent.withValues(alpha: 0.20)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -190,7 +190,7 @@ class _NotificationTile extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: scheme.primary.withOpacity(0.12),
+            color: scheme.primary.withValues(alpha: 0.12),
             shape: BoxShape.circle,
           ),
           child: Icon(
@@ -234,10 +234,10 @@ class _PackageTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: package.isFeatured ? scheme.primary.withOpacity(0.10) : scheme.surfaceContainerHighest.withOpacity(0.5),
+        color: package.isFeatured ? scheme.primary.withValues(alpha: 0.10) : scheme.surfaceContainerHighest.withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: package.isFeatured ? scheme.primary.withOpacity(0.22) : scheme.outlineVariant.withOpacity(0.30),
+          color: package.isFeatured ? scheme.primary.withValues(alpha: 0.22) : scheme.outlineVariant.withValues(alpha: 0.30),
         ),
       ),
       child: Row(
@@ -269,7 +269,7 @@ class _PackageTile extends StatelessWidget {
           if (package.isFeatured)
             Chip(
               label: const Text('Popular'),
-              backgroundColor: scheme.primary.withOpacity(0.14),
+              backgroundColor: scheme.primary.withValues(alpha: 0.14),
               side: BorderSide.none,
             ),
         ],
