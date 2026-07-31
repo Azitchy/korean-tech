@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../models/app_models.dart';
 
@@ -43,6 +44,19 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
     }
   }
 
+  void _playQuestionSound() {
+    SystemSound.play(SystemSoundType.click);
+    HapticFeedback.selectionClick();
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Playing sample audio for this question.'),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_submitted) {
@@ -79,9 +93,22 @@ class _ExamAttemptScreenState extends State<ExamAttemptScreen> {
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 18),
-              Text(
-                question.prompt,
-                style: Theme.of(context).textTheme.headlineSmall,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Text(
+                      question.prompt,
+                      style: Theme.of(context).textTheme.headlineSmall,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  IconButton.filledTonal(
+                    onPressed: _playQuestionSound,
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    tooltip: 'Play sound',
+                  ),
+                ],
               ),
               const SizedBox(height: 18),
               Expanded(

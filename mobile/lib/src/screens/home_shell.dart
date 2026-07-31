@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'dashboard_screen.dart';
+import 'audio_practice_screen.dart';
 import 'enquiries_screen.dart';
 import 'exams_screen.dart';
 import 'menu_screen.dart';
@@ -32,6 +33,7 @@ class _HomeShellState extends State<HomeShell> {
       _activeSection = section;
       if (section == AppSection.dashboard ||
           section == AppSection.exams ||
+          section == AppSection.audioPractice ||
           section == AppSection.profile) {
         _primaryTab = section;
       }
@@ -43,7 +45,8 @@ class _HomeShellState extends State<HomeShell> {
     return switch (_primaryTab) {
       AppSection.dashboard => 0,
       AppSection.exams => 1,
-      AppSection.profile => 2,
+      AppSection.audioPractice => 2,
+      AppSection.profile => 3,
       AppSection.results ||
       AppSection.notifications ||
       AppSection.packages ||
@@ -62,6 +65,7 @@ class _HomeShellState extends State<HomeShell> {
     return switch (_activeSection) {
       AppSection.dashboard => DashboardScreen(onNavigate: _openSection),
       AppSection.exams => const ExamsScreen(),
+      AppSection.audioPractice => const AudioPracticeScreen(),
       AppSection.results => const ResultsScreen(),
       AppSection.notifications => const NotificationsScreen(),
       AppSection.packages => const PackagesScreen(),
@@ -196,7 +200,7 @@ class _HomeShellState extends State<HomeShell> {
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
-                  'Use the bottom bar for Dashboard, Exams, and Profile.',
+                  'Use the bottom bar for Dashboard, Exams, Audio, and Profile.',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
               ),
@@ -213,7 +217,8 @@ class _HomeShellState extends State<HomeShell> {
         onDestinationSelected: (value) {
           if (value == 0) _openSection(AppSection.dashboard);
           if (value == 1) _openSection(AppSection.exams);
-          if (value == 2) _openSection(AppSection.profile);
+          if (value == 2) _openSection(AppSection.audioPractice);
+          if (value == 3) _openSection(AppSection.profile);
         },
         destinations: const [
           NavigationDestination(
@@ -225,6 +230,11 @@ class _HomeShellState extends State<HomeShell> {
             icon: Icon(Icons.quiz_outlined),
             selectedIcon: Icon(Icons.quiz),
             label: 'Exams',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.graphic_eq_outlined),
+            selectedIcon: Icon(Icons.graphic_eq),
+            label: 'Audio',
           ),
           NavigationDestination(
             icon: Icon(Icons.person_outline),

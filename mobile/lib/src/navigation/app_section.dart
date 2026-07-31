@@ -1,6 +1,7 @@
 enum AppSection {
   dashboard,
   exams,
+  audioPractice,
   results,
   notifications,
   packages,

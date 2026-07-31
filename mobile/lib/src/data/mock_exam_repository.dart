@@ -176,6 +176,109 @@ class MockExamRepository {
     ),
   ];
 
+  final List<ExamCardData> _audioExams = const [
+    ExamCardData(
+      title: 'Korean Listening Starter 01',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '20 min',
+      questions: 15,
+      score: 50,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'Everyday Conversation Audio',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '25 min',
+      questions: 18,
+      score: 60,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'Numbers and Time Listening',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '15 min',
+      questions: 12,
+      score: 40,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'Daily Life Dialogues',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '22 min',
+      questions: 16,
+      score: 55,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'School and Study Audio',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '24 min',
+      questions: 17,
+      score: 60,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'Food and Hobby Audio',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '18 min',
+      questions: 14,
+      score: 45,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'Travel and Location Audio',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '19 min',
+      questions: 15,
+      score: 50,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'Weather and Day Audio',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '17 min',
+      questions: 13,
+      score: 45,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'Greeting and Reply Audio',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '16 min',
+      questions: 12,
+      score: 40,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+    ExamCardData(
+      title: 'Mixed Review Audio Pack',
+      category: 'Korean',
+      mode: 'Audio',
+      duration: '30 min',
+      questions: 20,
+      score: 70,
+      startsAt: 'Available now',
+      isLocked: false,
+    ),
+  ];
+
   final List<PackagePlan> _packages = const [
     PackagePlan(
       name: 'Basic',
@@ -367,6 +470,11 @@ class MockExamRepository {
   Future<List<ExamCardData>> loadExams() async {
     await Future<void>.delayed(const Duration(milliseconds: 120));
     return _exams;
+  }
+
+  Future<List<ExamCardData>> loadAudioExams() async {
+    await Future<void>.delayed(const Duration(milliseconds: 120));
+    return _audioExams;
   }
 
   Future<List<PackagePlan>> loadPackages() async {

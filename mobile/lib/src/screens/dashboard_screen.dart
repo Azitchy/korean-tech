@@ -81,6 +81,10 @@ class DashboardScreen extends StatelessWidget {
                     _ExamPreviewSection(
                       onViewMore: () => onNavigate(AppSection.exams),
                     ),
+                    const SizedBox(height: 20),
+                    _AudioPracticeSection(
+                      onViewMore: () => onNavigate(AppSection.exams),
+                    ),
                   ],
                 );
               },
@@ -206,6 +210,80 @@ class _ExamPreviewSection extends StatelessWidget {
                             builder: (_) => ExamAttemptScreen(exam: exam),
                           ),
                         ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+class _AudioPracticeSection extends StatelessWidget {
+  const _AudioPracticeSection({
+    required this.onViewMore,
+  });
+
+  final VoidCallback onViewMore;
+
+  @override
+  Widget build(BuildContext context) {
+    final repo = MockExamRepository.instance;
+
+    return FutureBuilder<List<ExamCardData>>(
+      future: repo.loadAudioExams(),
+      builder: (context, snapshot) {
+        final exams = (snapshot.data ?? const <ExamCardData>[]).take(4).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Audio Practice',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                TextButton(
+                  onPressed: onViewMore,
+                  child: const Text('View more'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ...exams.map(
+              (exam) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Card(
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.secondary.withValues(alpha: 0.12),
+                      child: const Icon(Icons.graphic_eq_outlined),
+                    ),
+                    title: Text(exam.title),
+                    subtitle: Text('${exam.category} - ${exam.duration} - ${exam.questions} questions'),
+                    trailing: FilledButton(
+                      onPressed: exam.isLocked
+                          ? null
+                          : () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => ExamAttemptScreen(exam: exam),
+                                ),
+                              ),
+                      child: Text(exam.isLocked ? 'Locked' : 'Start now'),
+                    ),
+                    onTap: exam.isLocked
+                        ? null
+                        : () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => ExamAttemptScreen(exam: exam),
+                              ),
+                            ),
                   ),
                 ),
               ),
