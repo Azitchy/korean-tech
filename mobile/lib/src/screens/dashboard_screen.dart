@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../data/mock_exam_repository.dart';
 import '../models/app_models.dart';
 import '../navigation/app_section.dart';
+import 'exam_attempt_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({
@@ -53,7 +54,10 @@ class DashboardScreen extends StatelessWidget {
                 return ListView(
                   padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                   children: [
-                    _HeroHeader(scheme: scheme),
+                    _HeroHeader(
+                      scheme: scheme,
+                      onStartPracticeTest: () => onNavigate(AppSection.exams),
+                    ),
                     const SizedBox(height: 18),
                     GridView.builder(
                       itemCount: stats.length,
@@ -73,6 +77,10 @@ class DashboardScreen extends StatelessWidget {
                         );
                       },
                     ),
+                    const SizedBox(height: 20),
+                    _ExamPreviewSection(
+                      onViewMore: () => onNavigate(AppSection.exams),
+                    ),
                   ],
                 );
               },
@@ -85,9 +93,13 @@ class DashboardScreen extends StatelessWidget {
 }
 
 class _HeroHeader extends StatelessWidget {
-  const _HeroHeader({required this.scheme});
+  const _HeroHeader({
+    required this.scheme,
+    required this.onStartPracticeTest,
+  });
 
   final ColorScheme scheme;
+  final VoidCallback onStartPracticeTest;
 
   @override
   Widget build(BuildContext context) {
@@ -120,7 +132,7 @@ class _HeroHeader extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           FilledButton.tonal(
-            onPressed: () {},
+            onPressed: onStartPracticeTest,
             style: FilledButton.styleFrom(
               backgroundColor: scheme.onPrimary,
               foregroundColor: scheme.primary,
@@ -129,6 +141,78 @@ class _HeroHeader extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ExamPreviewSection extends StatelessWidget {
+  const _ExamPreviewSection({
+    required this.onViewMore,
+  });
+
+  final VoidCallback onViewMore;
+
+  @override
+  Widget build(BuildContext context) {
+    final repo = MockExamRepository.instance;
+
+    return FutureBuilder<List<ExamCardData>>(
+      future: repo.loadExams(),
+      builder: (context, snapshot) {
+        final exams = (snapshot.data ?? const <ExamCardData>[]).take(4).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Practice Exams',
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                ),
+                TextButton(
+                  onPressed: onViewMore,
+                  child: const Text('View more'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            ...exams.map(
+              (exam) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Card(
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    leading: CircleAvatar(
+                      backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                      child: const Icon(Icons.quiz_outlined),
+                    ),
+                    title: Text(exam.title),
+                    subtitle: Text('${exam.category} - ${exam.duration} - ${exam.questions} questions'),
+                    trailing: FilledButton(
+                      onPressed: exam.isLocked
+                          ? null
+                          : () => Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => ExamAttemptScreen(exam: exam),
+                                ),
+                              ),
+                      child: Text(exam.isLocked ? 'Locked' : 'Start now'),
+                    ),
+                    onTap: exam.isLocked ? null : () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => ExamAttemptScreen(exam: exam),
+                          ),
+                        ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

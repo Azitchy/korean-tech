@@ -262,41 +262,140 @@ class _ExamOption {
 }
 
 List<_ExamQuestion> _buildDummyQuestions(ExamCardData exam) {
-  return [
+  return const [
     _ExamQuestion(
-      prompt: 'Which section of ${exam.category} is listening based?',
-      options: const [
-        _ExamOption(label: 'A', text: 'Reading', isCorrect: false),
-        _ExamOption(label: 'B', text: 'Listening', isCorrect: true),
-        _ExamOption(label: 'C', text: 'Writing', isCorrect: false),
-        _ExamOption(label: 'D', text: 'Grammar', isCorrect: false),
+      prompt: '안녕하세요?',
+      options: [
+        _ExamOption(label: 'A', text: '안녕하세요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '감사합니다.', isCorrect: false),
+        _ExamOption(label: 'C', text: '잘 가요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '실례합니다.', isCorrect: false),
       ],
     ),
     _ExamQuestion(
-      prompt: 'How many options are shown in this dummy question?',
-      options: const [
-        _ExamOption(label: 'A', text: 'Two', isCorrect: false),
-        _ExamOption(label: 'B', text: 'Three', isCorrect: false),
-        _ExamOption(label: 'C', text: 'Four', isCorrect: true),
-        _ExamOption(label: 'D', text: 'Five', isCorrect: false),
+      prompt: '이름이 뭐예요?',
+      options: [
+        _ExamOption(label: 'A', text: '제 이름은 민수예요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '저는 네팔에서 왔어요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '오늘은 금요일이에요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '김치를 좋아해요.', isCorrect: false),
       ],
     ),
     _ExamQuestion(
-      prompt: 'What should the user do after choosing an answer?',
-      options: const [
-        _ExamOption(label: 'A', text: 'Next question', isCorrect: true),
-        _ExamOption(label: 'B', text: 'Close app', isCorrect: false),
-        _ExamOption(label: 'C', text: 'Reset exam', isCorrect: false),
-        _ExamOption(label: 'D', text: 'Submit immediately', isCorrect: false),
+      prompt: '어디에서 왔어요?',
+      options: [
+        _ExamOption(label: 'A', text: '저는 네팔에서 왔어요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '저는 카트만두에 살아요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '제 취미는 음악 듣기예요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '한국어를 공부해요.', isCorrect: false),
       ],
     ),
     _ExamQuestion(
-      prompt: 'What appears at the end of the exam flow?',
-      options: const [
-        _ExamOption(label: 'A', text: 'Result summary', isCorrect: true),
-        _ExamOption(label: 'B', text: 'Menu screen', isCorrect: false),
-        _ExamOption(label: 'C', text: 'Profile screen', isCorrect: false),
-        _ExamOption(label: 'D', text: 'Settings screen', isCorrect: false),
+      prompt: '몇 살이에요?',
+      options: [
+        _ExamOption(label: 'A', text: '저는 스무 살이에요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '지금 세 시예요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '오늘은 금요일이에요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '네, 조금 할 수 있어요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '한국어를 할 수 있어요?',
+      options: [
+        _ExamOption(label: 'A', text: '네, 조금 할 수 있어요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '저는 네팔에서 왔어요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '날씨가 좋아요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '학교에 다녀요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '지금 몇 시예요?',
+      options: [
+        _ExamOption(label: 'A', text: '지금 세 시예요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '오늘은 금요일이에요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '네, 좋아해요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '김치를 좋아해요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '오늘은 무슨 요일이에요?',
+      options: [
+        _ExamOption(label: 'A', text: '오늘은 금요일이에요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '저는 스무 살이에요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '제 이름은 민수예요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '한국어를 공부해요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '좋아하는 음식이 뭐예요?',
+      options: [
+        _ExamOption(label: 'A', text: '김치를 좋아해요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '제 취미는 음악 듣기예요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '학교에 다녀요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '날씨가 좋아요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '취미가 뭐예요?',
+      options: [
+        _ExamOption(label: 'A', text: '제 취미는 음악 듣기예요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '저는 카트만두에 살아요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '네, 조금 할 수 있어요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '지금 세 시예요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '학교에 다녀요?',
+      options: [
+        _ExamOption(label: 'A', text: '네, 학교에 다녀요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '저는 스무 살이에요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '오늘은 금요일이에요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '김치를 좋아해요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '어디에 살아요?',
+      options: [
+        _ExamOption(label: 'A', text: '저는 카트만두에 살아요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '저는 네팔에서 왔어요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '학교에 다녀요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '안녕하세요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '날씨가 어때요?',
+      options: [
+        _ExamOption(label: 'A', text: '날씨가 좋아요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '제 이름은 민수예요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '지금 세 시예요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '네, 조금 할 수 있어요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '무엇을 공부해요?',
+      options: [
+        _ExamOption(label: 'A', text: '한국어를 공부해요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '김치를 좋아해요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '저는 스무 살이에요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '오늘은 금요일이에요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '커피를 좋아해요?',
+      options: [
+        _ExamOption(label: 'A', text: '네, 좋아해요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '안녕하세요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '학교에 다녀요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '저는 카트만두에 살아요.', isCorrect: false),
+      ],
+    ),
+    _ExamQuestion(
+      prompt: '만나서 반가워요.',
+      options: [
+        _ExamOption(label: 'A', text: '저도 만나서 반가워요.', isCorrect: true),
+        _ExamOption(label: 'B', text: '날씨가 좋아요.', isCorrect: false),
+        _ExamOption(label: 'C', text: '제 취미는 음악 듣기예요.', isCorrect: false),
+        _ExamOption(label: 'D', text: '한국어를 공부해요.', isCorrect: false),
       ],
     ),
   ];
