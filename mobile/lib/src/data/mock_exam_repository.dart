@@ -10,14 +10,8 @@ class MockExamRepository {
   final List<SummaryStat> _stats = const [
     SummaryStat(label: 'Available Exams', value: '24', icon: Icons.assignment_turned_in, accent: Color(0xFF0EA5A4)),
     SummaryStat(label: 'Purchased Package', value: 'Premium', icon: Icons.workspace_premium, accent: Color(0xFFF97316)),
-    SummaryStat(label: 'Recent Results', value: '18', icon: Icons.receipt_long, accent: Color(0xFF3B82F6)),
-    SummaryStat(label: 'Leaderboard Rank', value: '#12', icon: Icons.emoji_events, accent: Color(0xFF8B5CF6)),
     SummaryStat(label: 'Active Courses', value: '10', icon: Icons.menu_book, accent: Color(0xFF14B8A6)),
-    SummaryStat(label: 'Saved Bookmarks', value: '32', icon: Icons.bookmark_outline, accent: Color(0xFFF59E0B)),
-    SummaryStat(label: 'Practice Streak', value: '14', icon: Icons.local_fire_department_outlined, accent: Color(0xFFEF4444)),
-    SummaryStat(label: 'Notifications', value: '10', icon: Icons.notifications_none, accent: Color(0xFF0EA5E9)),
-    SummaryStat(label: 'Enquiries', value: '10', icon: Icons.forum_outlined, accent: Color(0xFF6366F1)),
-    SummaryStat(label: 'Certificates', value: '8', icon: Icons.workspace_premium_outlined, accent: Color(0xFF22C55E)),
+    SummaryStat(label: 'Gallery', value: '10', icon: Icons.photo_library_outlined, accent: Color(0xFF6366F1)),
   ];
 
   final List<DashboardNotification> _notifications = const [

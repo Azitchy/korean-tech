@@ -40,9 +40,9 @@ class ResultsScreen extends StatelessWidget {
               future: repo.loadWeeklyProgress(),
               builder: (context, snapshot) {
                 final points = snapshot.data ?? const [];
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 12,
                   children: points
                       .map(
                         (point) => _ProgressBar(point: point),
@@ -145,7 +145,7 @@ class _ProgressBar extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return SizedBox(
-      width: 34,
+      width: 36,
       height: 160,
       child: Column(
         children: [

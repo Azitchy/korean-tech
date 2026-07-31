@@ -5,6 +5,7 @@ enum AppSection {
   notifications,
   packages,
   menu,
+  gallery,
   enquiries,
   profile,
   courses,

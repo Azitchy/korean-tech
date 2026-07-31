@@ -19,14 +19,8 @@ class DashboardScreen extends StatelessWidget {
     const destinations = <AppSection>[
       AppSection.exams,
       AppSection.packages,
-      AppSection.results,
-      AppSection.leaderboard,
+      AppSection.gallery,
       AppSection.courses,
-      AppSection.bookmarks,
-      AppSection.streak,
-      AppSection.notifications,
-      AppSection.enquiries,
-      AppSection.certificates,
     ];
 
     return FutureBuilder<List<SummaryStat>>(
@@ -46,30 +40,42 @@ class DashboardScreen extends StatelessWidget {
             ),
           ),
           child: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-              children: [
-                _HeroHeader(scheme: scheme),
-                const SizedBox(height: 18),
-                GridView.builder(
-                  itemCount: stats.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    mainAxisSpacing: 12,
-                    crossAxisSpacing: 12,
-                    childAspectRatio: 1.2,
-                  ),
-                  itemBuilder: (context, index) {
-                    final stat = stats[index];
-                    return _StatTile(
-                      stat: stat,
-                      onTap: () => onNavigate(destinations[index]),
-                    );
-                  },
-                ),
-              ],
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final columns = constraints.maxWidth >= 900
+                    ? 4
+                    : constraints.maxWidth >= 600
+                        ? 3
+                        : constraints.maxWidth >= 380
+                            ? 2
+                            : 1;
+
+                return ListView(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  children: [
+                    _HeroHeader(scheme: scheme),
+                    const SizedBox(height: 18),
+                    GridView.builder(
+                      itemCount: stats.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: columns,
+                        mainAxisSpacing: 12,
+                        crossAxisSpacing: 12,
+                        childAspectRatio: columns == 1 ? 2.6 : 1.25,
+                      ),
+                      itemBuilder: (context, index) {
+                        final stat = stats[index];
+                        return _StatTile(
+                          stat: stat,
+                          onTap: () => onNavigate(destinations[index]),
+                        );
+                      },
+                    ),
+                  ],
+                );
+              },
             ),
           ),
         );

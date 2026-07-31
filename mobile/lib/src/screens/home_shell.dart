@@ -9,6 +9,7 @@ import 'bookmarks_screen.dart';
 import 'streak_screen.dart';
 import 'certificates_screen.dart';
 import 'leaderboard_screen.dart';
+import 'gallery_screen.dart';
 import 'notifications_screen.dart';
 import 'packages_screen.dart';
 import 'profile_screen.dart';
@@ -47,6 +48,7 @@ class _HomeShellState extends State<HomeShell> {
       AppSection.notifications ||
       AppSection.packages ||
       AppSection.menu ||
+      AppSection.gallery ||
       AppSection.enquiries ||
       AppSection.courses ||
       AppSection.bookmarks ||
@@ -64,6 +66,7 @@ class _HomeShellState extends State<HomeShell> {
       AppSection.notifications => const NotificationsScreen(),
       AppSection.packages => const PackagesScreen(),
       AppSection.menu => const MenuScreen(),
+      AppSection.gallery => const GalleryScreen(),
       AppSection.enquiries => const EnquiriesScreen(),
       AppSection.profile => const ProfileScreen(),
       AppSection.courses => const CoursesScreen(),
@@ -76,6 +79,7 @@ class _HomeShellState extends State<HomeShell> {
 
   @override
   Widget build(BuildContext context) {
+    final drawerWidth = (MediaQuery.of(context).size.width * 0.84).clamp(280.0, 360.0).toDouble();
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0,
@@ -99,9 +103,10 @@ class _HomeShellState extends State<HomeShell> {
         ),
       ),
       drawer: Drawer(
+        width: drawerWidth,
         child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
+            padding: EdgeInsets.zero,
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
@@ -147,6 +152,12 @@ class _HomeShellState extends State<HomeShell> {
                 onTap: () => _openSection(AppSection.menu),
               ),
               _DrawerItem(
+                icon: Icons.photo_library_outlined,
+                label: 'Gallery',
+                selected: _activeSection == AppSection.gallery,
+                onTap: () => _openSection(AppSection.gallery),
+              ),
+              _DrawerItem(
                 icon: Icons.forum_outlined,
                 label: 'Enquiries',
                 selected: _activeSection == AppSection.enquiries,
@@ -182,7 +193,6 @@ class _HomeShellState extends State<HomeShell> {
                 selected: _activeSection == AppSection.leaderboard,
                 onTap: () => _openSection(AppSection.leaderboard),
               ),
-              const Spacer(),
               Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
