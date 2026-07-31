@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../data/mock_exam_repository.dart';
 import '../models/app_models.dart';
-import '../widgets/section_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -12,16 +11,10 @@ class DashboardScreen extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final repo = MockExamRepository.instance;
 
-    return FutureBuilder<List<Object?>>(
-      future: Future.wait([
-        repo.loadStats(),
-        repo.loadNotifications(),
-        repo.loadPackages(),
-      ]),
+    return FutureBuilder<List<SummaryStat>>(
+      future: repo.loadStats(),
       builder: (context, snapshot) {
-        final stats = (snapshot.data?[0] as List?)?.cast<SummaryStat>() ?? const [];
-        final notifications = (snapshot.data?[1] as List?)?.cast<DashboardNotification>() ?? const [];
-        final packages = (snapshot.data?[2] as List?)?.cast<PackagePlan>() ?? const [];
+        final stats = snapshot.data ?? const [];
 
         return Container(
           decoration: BoxDecoration(
@@ -54,35 +47,6 @@ class DashboardScreen extends StatelessWidget {
                     final stat = stats[index];
                     return _StatTile(stat: stat);
                   },
-                ),
-                const SizedBox(height: 18),
-                SectionCard(
-                  title: 'Latest Notifications',
-                  trailing: Text('Live', style: TextStyle(color: scheme.primary)),
-                  child: Column(
-                    children: notifications
-                        .map(
-                          (note) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _NotificationTile(notification: note),
-                          ),
-                        )
-                        .toList(),
-                  ),
-                ),
-                const SizedBox(height: 18),
-                SectionCard(
-                  title: 'Recommended Packages',
-                  child: Column(
-                    children: packages
-                        .map(
-                          (package) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: _PackageTile(package: package),
-                          ),
-                        )
-                        .toList(),
-                  ),
                 ),
               ],
             ),
@@ -169,109 +133,6 @@ class _StatTile extends StatelessWidget {
               Text(stat.label, style: Theme.of(context).textTheme.bodyMedium),
             ],
           ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NotificationTile extends StatelessWidget {
-  const _NotificationTile({required this.notification});
-
-  final DashboardNotification notification;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: scheme.primary.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            notification.type == 'reply' ? Icons.chat_bubble_outline : Icons.notifications_none,
-            color: scheme.primary,
-            size: 20,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(notification.title, style: const TextStyle(fontWeight: FontWeight.w700)),
-                  ),
-                  Text(notification.time, style: Theme.of(context).textTheme.bodySmall),
-                ],
-              ),
-              const SizedBox(height: 4),
-              Text(notification.body),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _PackageTile extends StatelessWidget {
-  const _PackageTile({required this.package});
-
-  final PackagePlan package;
-
-  @override
-  Widget build(BuildContext context) {
-    final scheme = Theme.of(context).colorScheme;
-
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: package.isFeatured ? scheme.primary.withValues(alpha: 0.10) : scheme.surfaceContainerHighest.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: package.isFeatured ? scheme.primary.withValues(alpha: 0.22) : scheme.outlineVariant.withValues(alpha: 0.30),
-        ),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(package.name, style: Theme.of(context).textTheme.titleLarge),
-                const SizedBox(height: 4),
-                Text('${package.price} • ${package.duration}'),
-                const SizedBox(height: 10),
-                ...package.features.map(
-                  (feature) => Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Row(
-                      children: [
-                        Icon(Icons.check_circle, size: 16, color: scheme.primary),
-                        const SizedBox(width: 8),
-                        Expanded(child: Text(feature)),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 12),
-          if (package.isFeatured)
-            Chip(
-              label: const Text('Popular'),
-              backgroundColor: scheme.primary.withValues(alpha: 0.14),
-              side: BorderSide.none,
-            ),
         ],
       ),
     );
