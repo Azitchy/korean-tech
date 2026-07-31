@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'screens/home_shell.dart';
+import 'screens/splash_screen.dart';
 
 class ExamApp extends StatelessWidget {
   const ExamApp({super.key});
@@ -58,7 +58,7 @@ class ExamApp extends StatelessWidget {
       theme: themeFor(lightScheme),
       darkTheme: themeFor(darkScheme),
       themeMode: ThemeMode.system,
-      home: const HomeShell(),
+      home: const SplashScreen(),
     );
   }
 }

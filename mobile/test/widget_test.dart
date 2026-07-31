@@ -10,8 +10,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile/src/app.dart';
 
 void main() {
-  testWidgets('App boots to dashboard', (WidgetTester tester) async {
+  testWidgets('App shows splash then dashboard', (WidgetTester tester) async {
     await tester.pumpWidget(const ExamApp());
+    expect(find.text('Online Test & Examination'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 3));
     await tester.pumpAndSettle();
 
     expect(find.text('Welcome back, Student'), findsOneWidget);

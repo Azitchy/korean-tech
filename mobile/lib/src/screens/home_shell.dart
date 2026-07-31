@@ -4,13 +4,13 @@ import 'dashboard_screen.dart';
 import 'enquiries_screen.dart';
 import 'exams_screen.dart';
 import 'menu_screen.dart';
-import 'notifications_screen.dart';
-import 'packages_screen.dart';
 import 'courses_screen.dart';
 import 'bookmarks_screen.dart';
 import 'streak_screen.dart';
 import 'certificates_screen.dart';
 import 'leaderboard_screen.dart';
+import 'notifications_screen.dart';
+import 'packages_screen.dart';
 import 'profile_screen.dart';
 import 'results_screen.dart';
 import '../navigation/app_section.dart';
@@ -78,7 +78,18 @@ class _HomeShellState extends State<HomeShell> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ExamVerse'),
+        titleSpacing: 0,
+        title: Row(
+          children: [
+            Image.asset(
+              'lib/src/assets/logo.png',
+              height: 28,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 10),
+            const Text('ExamVerse'),
+          ],
+        ),
         leading: Builder(
           builder: (context) => IconButton(
             icon: const Icon(Icons.menu),
@@ -94,9 +105,21 @@ class _HomeShellState extends State<HomeShell> {
             children: [
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
-                child: Text(
-                  'More Sections',
-                  style: Theme.of(context).textTheme.headlineSmall,
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'lib/src/assets/logo.png',
+                      height: 34,
+                      fit: BoxFit.contain,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'More Sections',
+                        style: Theme.of(context).textTheme.headlineSmall,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               _DrawerItem(
