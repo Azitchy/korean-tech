@@ -27,7 +27,10 @@ class DashboardNotification {
       title: _string(json['title']) ?? '',
       body: _string(json['body']) ?? '',
       type: _string(_mapValue(json['metadata'])?['type']) ?? 'system',
-      time: _string(json['subtitle']) ?? _string(json['published_at']) ?? 'Just now',
+      time:
+          _string(json['subtitle']) ??
+          _string(json['published_at']) ??
+          'Just now',
     );
   }
 
@@ -59,7 +62,8 @@ class ExamCardData {
     return ExamCardData(
       id: _int(json['id']) ?? 0,
       title: _string(json['title']) ?? 'Untitled exam',
-      category: _string(category?['name']) ?? _string(course?['title']) ?? 'General',
+      category:
+          _string(category?['name']) ?? _string(course?['title']) ?? 'General',
       mode: _labelize(type),
       duration: '${_int(json['duration_minutes']) ?? 0} min',
       questions: _int(json['question_count']) ?? 0,
@@ -101,14 +105,15 @@ class ExamOptionData {
 }
 
 class ExamQuestionData {
-  const ExamQuestionData({
-    required this.prompt,
-    required this.options,
-  });
+  const ExamQuestionData({required this.prompt, required this.options});
 
   factory ExamQuestionData.fromJson(Map<String, dynamic> json) {
     final options = _list(json['options'])
-        .map((item) => ExamOptionData.fromJson(_mapValue(item) ?? const <String, dynamic>{}))
+        .map(
+          (item) => ExamOptionData.fromJson(
+            _mapValue(item) ?? const <String, dynamic>{},
+          ),
+        )
         .toList();
 
     return ExamQuestionData(
@@ -122,10 +127,7 @@ class ExamQuestionData {
 }
 
 class ExamDetailData {
-  const ExamDetailData({
-    required this.exam,
-    required this.questions,
-  });
+  const ExamDetailData({required this.exam, required this.questions});
 
   final ExamCardData exam;
   final List<ExamQuestionData> questions;
@@ -147,7 +149,9 @@ class PackagePlan {
       price: '\$${price.toStringAsFixed(2)}',
       duration: '${_int(json['duration_days']) ?? 0} days',
       features: _list(json['features']).map((item) => item.toString()).toList(),
-      isFeatured: (_string(json['status']) ?? '') == 'featured' || (_string(json['name']) ?? '') == 'Premium',
+      isFeatured:
+          (_string(json['status']) ?? '') == 'featured' ||
+          (_string(json['name']) ?? '') == 'Premium',
     );
   }
 
@@ -191,7 +195,8 @@ class EnquiryThread {
       subject: _string(json['subject']) ?? '',
       category: _string(category?['name']) ?? 'General',
       status: _string(json['status']) ?? 'open',
-      lastMessage: _string(json['teacher_reply']) ?? _string(json['message']) ?? '',
+      lastMessage:
+          _string(json['teacher_reply']) ?? _string(json['message']) ?? '',
       updatedAt: _string(json['updated_at']) ?? 'Just now',
     );
   }
@@ -204,15 +209,15 @@ class EnquiryThread {
 }
 
 class ProfileBadge {
-  const ProfileBadge({
-    required this.label,
-    required this.value,
-  });
+  const ProfileBadge({required this.label, required this.value});
 
   factory ProfileBadge.fromJson(Map<String, dynamic> json) {
     return ProfileBadge(
       label: _string(json['title']) ?? '',
-      value: _string(_mapValue(json['metadata'])?['value']) ?? _string(json['subtitle']) ?? '',
+      value:
+          _string(_mapValue(json['metadata'])?['value']) ??
+          _string(json['subtitle']) ??
+          '',
     );
   }
 
@@ -221,10 +226,7 @@ class ProfileBadge {
 }
 
 class PerformancePoint {
-  const PerformancePoint({
-    required this.label,
-    required this.value,
-  });
+  const PerformancePoint({required this.label, required this.value});
 
   factory PerformancePoint.fromJson(Map<String, dynamic> json) {
     return PerformancePoint(
@@ -301,8 +303,14 @@ class LeaderboardEntry {
     return LeaderboardEntry(
       rank: _int(item.metadata['rank']) ?? item.sortOrder,
       name: item.title,
-      score: _int(item.metadata['score']) ?? int.tryParse(item.subtitle ?? '') ?? 0,
-      fastestCompletion: _string(item.metadata['fastest_completion']) ?? _string(item.body) ?? '',
+      score:
+          _int(item.metadata['score']) ??
+          int.tryParse(item.subtitle ?? '') ??
+          0,
+      fastestCompletion:
+          _string(item.metadata['fastest_completion']) ??
+          _string(item.body) ??
+          '',
     );
   }
 
@@ -341,6 +349,187 @@ class CourseSummaryData {
   final String level;
   final String category;
   final String subject;
+}
+
+class CategorySummaryData {
+  const CategorySummaryData({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.status,
+    required this.courseCount,
+  });
+
+  factory CategorySummaryData.fromJson(Map<String, dynamic> json) {
+    return CategorySummaryData(
+      id: _int(json['id']) ?? 0,
+      name: _string(json['name']) ?? '',
+      description: _string(json['description']) ?? '',
+      status: _string(json['status']) ?? 'active',
+      courseCount: _int(json['courses_count']) ?? 0,
+    );
+  }
+
+  final int id;
+  final String name;
+  final String description;
+  final String status;
+  final int courseCount;
+}
+
+class DashboardSectionSummary {
+  const DashboardSectionSummary({required this.section, required this.total});
+
+  factory DashboardSectionSummary.fromJson(Map<String, dynamic> json) {
+    return DashboardSectionSummary(
+      section: _string(json['section']) ?? '',
+      total: _int(json['total']) ?? 0,
+    );
+  }
+
+  final String section;
+  final int total;
+}
+
+class DashboardSnapshot {
+  const DashboardSnapshot({
+    required this.summary,
+    required this.categories,
+    required this.upcomingExams,
+    required this.featuredPackages,
+    required this.notifications,
+    required this.results,
+    required this.leaderboard,
+    required this.gallery,
+    required this.bookmarks,
+    required this.streak,
+    required this.certificates,
+    required this.profileBadges,
+    required this.weeklyProgress,
+    required this.menuShortcuts,
+    required this.sections,
+  });
+
+  factory DashboardSnapshot.fromJson(Map<String, dynamic> json) {
+    final summary = _mapValue(json['summary']) ?? const <String, dynamic>{};
+    return DashboardSnapshot(
+      summary: summary,
+      categories: _list(json['categories'])
+          .map(
+            (item) => CategorySummaryData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      upcomingExams: _list(json['upcoming_exams'])
+          .map(
+            (item) => ExamCardData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      featuredPackages: _list(json['featured_packages'])
+          .map(
+            (item) => PackagePlan.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      notifications: _list(json['notifications'])
+          .map(
+            (item) => ContentItemData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      results: _list(json['results'])
+          .map(
+            (item) => ContentItemData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      leaderboard: _list(json['leaderboard'])
+          .map(
+            (item) => ContentItemData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      gallery: _list(json['gallery'])
+          .map(
+            (item) => ContentItemData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      bookmarks: _list(json['bookmarks'])
+          .map(
+            (item) => ContentItemData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      streak: _list(json['streak'])
+          .map(
+            (item) => ContentItemData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      certificates: _list(json['certificates'])
+          .map(
+            (item) => ContentItemData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      profileBadges: _list(_mapValue(json['profile'])?['badges'])
+          .map(
+            (item) => ProfileBadge.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      weeklyProgress: _list(json['weekly_progress'])
+          .map(
+            (item) => PerformancePoint.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      menuShortcuts: _list(json['menu'])
+          .map(
+            (item) => ContentItemData.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+      sections: _list(json['sections'])
+          .map(
+            (item) => DashboardSectionSummary.fromJson(
+              _mapValue(item) ?? const <String, dynamic>{},
+            ),
+          )
+          .toList(),
+    );
+  }
+
+  final Map<String, dynamic> summary;
+  final List<CategorySummaryData> categories;
+  final List<ExamCardData> upcomingExams;
+  final List<PackagePlan> featuredPackages;
+  final List<ContentItemData> notifications;
+  final List<ContentItemData> results;
+  final List<ContentItemData> leaderboard;
+  final List<ContentItemData> gallery;
+  final List<ContentItemData> bookmarks;
+  final List<ContentItemData> streak;
+  final List<ContentItemData> certificates;
+  final List<ProfileBadge> profileBadges;
+  final List<PerformancePoint> weeklyProgress;
+  final List<ContentItemData> menuShortcuts;
+  final List<DashboardSectionSummary> sections;
 }
 
 int? _int(dynamic value) {

@@ -12,8 +12,8 @@ class ExamRepository {
   final ApiService _api = ApiService();
 
   Future<List<SummaryStat>> loadStats() async {
-    final dashboard = await _dashboard();
-    final summary = _map(dashboard['summary']);
+    final dashboard = await loadDashboard();
+    final summary = dashboard.summary;
 
     return [
       SummaryStat(
@@ -64,12 +64,25 @@ class ExamRepository {
         icon: Icons.phone_android_outlined,
         accent: const Color(0xFF14B8A6),
       ),
+      SummaryStat(
+        label: 'Today\'s Exams',
+        value: '${_int(summary['todays_exams']) ?? 0}',
+        icon: Icons.today_outlined,
+        accent: const Color(0xFF8B5CF6),
+      ),
     ];
   }
 
+  Future<DashboardSnapshot> loadDashboard() async {
+    final response = await _api.getJson('/dashboard');
+    return DashboardSnapshot.fromJson(response);
+  }
+
   Future<List<DashboardNotification>> loadNotifications() async {
-    final items = await loadSectionItems('notifications');
-    return items.map((item) => DashboardNotification.fromJson(item.toJson())).toList();
+    final dashboard = await loadDashboard();
+    return dashboard.notifications
+        .map((item) => DashboardNotification.fromJson(item.toJson()))
+        .toList();
   }
 
   Future<List<ExamCardData>> loadExams() async {
@@ -86,76 +99,110 @@ class ExamRepository {
     final response = await _api.getJson('/exams/$examId');
     final data = _map(response['data']);
     final exam = ExamCardData.fromJson(data);
-    final questions = _items(data['questions'])
-        .map((item) => ExamQuestionData.fromJson(_map(item)))
-        .toList();
+    final questions = _items(
+      data['questions'],
+    ).map((item) => ExamQuestionData.fromJson(_map(item))).toList();
 
     return ExamDetailData(exam: exam, questions: questions);
   }
 
   Future<List<PackagePlan>> loadPackages() async {
     final packages = await _api.getList('/packages');
-    return packages.cast<Map<String, dynamic>>().map(PackagePlan.fromJson).toList();
+    return packages
+        .cast<Map<String, dynamic>>()
+        .map(PackagePlan.fromJson)
+        .toList();
   }
 
   Future<List<ResultSnapshot>> loadResults() async {
-    final items = await loadSectionItems('results');
-    return items
-        .map((item) {
-          final metadata = item.metadata;
-          return ResultSnapshot(
-            title: item.title,
-            percentage: _int(metadata['percentage']) ?? 0,
-            correct: _int(metadata['correct']) ?? 0,
-            wrong: _int(metadata['wrong']) ?? 0,
-            skipped: _int(metadata['skipped']) ?? 0,
-            status: _string(metadata['status']) ?? item.subtitle ?? 'PASS',
-          );
-        })
-        .toList();
+    final dashboard = await loadDashboard();
+    final items = dashboard.results;
+    return items.map((item) {
+      final metadata = item.metadata;
+      return ResultSnapshot(
+        title: item.title,
+        percentage: _int(metadata['percentage']) ?? 0,
+        correct: _int(metadata['correct']) ?? 0,
+        wrong: _int(metadata['wrong']) ?? 0,
+        skipped: _int(metadata['skipped']) ?? 0,
+        status: _string(metadata['status']) ?? item.subtitle ?? 'PASS',
+      );
+    }).toList();
   }
 
   Future<List<EnquiryThread>> loadEnquiries() async {
     final enquiries = await _api.getList('/enquiries');
-    return enquiries.cast<Map<String, dynamic>>().map(EnquiryThread.fromJson).toList();
+    return enquiries
+        .cast<Map<String, dynamic>>()
+        .map(EnquiryThread.fromJson)
+        .toList();
   }
 
   Future<List<ProfileBadge>> loadBadges() async {
-    final items = await loadSectionItems('profile_badges');
-    return items.map((item) => ProfileBadge(label: item.title, value: item.subtitle ?? '')).toList();
+    final dashboard = await loadDashboard();
+    return dashboard.profileBadges;
   }
 
   Future<List<PerformancePoint>> loadWeeklyProgress() async {
-    final items = await loadSectionItems('weekly_progress');
-    return items.map((item) => PerformancePoint.fromJson(item.toJson())).toList();
+    final dashboard = await loadDashboard();
+    return dashboard.weeklyProgress;
   }
 
   Future<List<GalleryBook>> loadGalleryBooks() async {
-    final items = await loadSectionItems('gallery');
+    final dashboard = await loadDashboard();
+    final items = dashboard.gallery;
     return items.map(GalleryBook.fromContentItem).toList();
   }
 
   Future<List<CourseSummaryData>> loadCourses() async {
     final courses = await _api.getList('/courses');
-    return courses.cast<Map<String, dynamic>>().map(CourseSummaryData.fromJson).toList();
+    return courses
+        .cast<Map<String, dynamic>>()
+        .map(CourseSummaryData.fromJson)
+        .toList();
   }
 
-  Future<List<ContentItemData>> loadBookmarks() => loadSectionItems('bookmarks');
+  Future<List<CategorySummaryData>> loadCategories() async {
+    final dashboard = await loadDashboard();
+    return dashboard.categories;
+  }
 
-  Future<List<ContentItemData>> loadStreakItems() => loadSectionItems('streak');
+  Future<List<PackagePlan>> loadFeaturedPackages() async {
+    final dashboard = await loadDashboard();
+    return dashboard.featuredPackages;
+  }
 
-  Future<List<ContentItemData>> loadCertificates() => loadSectionItems('certificates');
+  Future<List<ContentItemData>> loadBookmarks() async {
+    final dashboard = await loadDashboard();
+    return dashboard.bookmarks;
+  }
+
+  Future<List<ContentItemData>> loadStreakItems() async {
+    final dashboard = await loadDashboard();
+    return dashboard.streak;
+  }
+
+  Future<List<ContentItemData>> loadCertificates() async {
+    final dashboard = await loadDashboard();
+    return dashboard.certificates;
+  }
 
   Future<List<LeaderboardEntry>> loadLeaderboard() async {
-    final items = await loadSectionItems('leaderboard');
+    final dashboard = await loadDashboard();
+    final items = dashboard.leaderboard;
     return items.map(LeaderboardEntry.fromContent).toList();
   }
 
-  Future<List<ContentItemData>> loadMenuShortcuts() => loadSectionItems('menu_shortcuts');
+  Future<List<ContentItemData>> loadMenuShortcuts() async {
+    final dashboard = await loadDashboard();
+    return dashboard.menuShortcuts;
+  }
 
   Future<List<ContentItemData>> loadSectionItems(String section) async {
     final response = await _api.getJson('/mobile/content/$section');
-    return _items(response['data']).map((item) => ContentItemData.fromJson(_map(item))).toList();
+    return _items(
+      response['data'],
+    ).map((item) => ContentItemData.fromJson(_map(item))).toList();
   }
 
   Future<void> submitEnquiry({
@@ -165,26 +212,20 @@ class ExamRepository {
     required String message,
     int? categoryId,
   }) async {
-    await _api.postJson(
-      '/enquiries',
-      {
-        'name': name,
-        'email': email,
-        'subject': subject,
-        'message': message,
-        if (categoryId != null) 'category_id': categoryId,
-      },
-    );
+    await _api.postJson('/enquiries', {
+      'name': name,
+      'email': email,
+      'subject': subject,
+      'message': message,
+      if (categoryId != null) 'category_id': categoryId,
+    });
   }
 
-  Future<List<Map<String, dynamic>>> _loadExams([String path = '/exams']) async {
+  Future<List<Map<String, dynamic>>> _loadExams([
+    String path = '/exams',
+  ]) async {
     final items = await _api.getList(path);
     return items.cast<Map<String, dynamic>>();
-  }
-
-  Future<Map<String, dynamic>> _dashboard() async {
-    final response = await _api.getJson('/dashboard');
-    return _map(response);
   }
 
   Map<String, dynamic> _map(dynamic value) {
