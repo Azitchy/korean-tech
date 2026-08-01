@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 
-import 'api_config.dart';
+import '../config/backend_config.dart';
 
 class ApiException implements Exception {
   const ApiException(this.message, {this.statusCode});
@@ -63,7 +63,7 @@ class ApiService {
   ) async {
     Object? lastError;
 
-    for (final baseUrl in ApiConfig.candidateBaseUrls) {
+    for (final baseUrl in BackendConfig.candidateBaseUrls) {
       final uri = Uri.parse('$baseUrl$path');
       try {
         final response = await send(uri);

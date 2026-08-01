@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../data/mock_exam_repository.dart';
+import '../data/exam_repository.dart';
 import '../models/app_models.dart';
 
 class ExamAttemptScreen extends StatefulWidget {
@@ -22,7 +22,7 @@ class ExamAttemptScreenState extends State<ExamAttemptScreen> {
   @override
   void initState() {
     super.initState();
-    _detailFuture = MockExamRepository.instance.loadExamDetail(widget.exam.id);
+    _detailFuture = ExamRepository.instance.loadExamDetail(widget.exam.id);
   }
 
   void _selectAnswer(int optionIndex) {

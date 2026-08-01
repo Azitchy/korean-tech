@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_exam_repository.dart';
+import '../data/exam_repository.dart';
 import '../models/app_models.dart';
 
 class PackagesScreen extends StatelessWidget {
@@ -8,7 +8,7 @@ class PackagesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repo = MockExamRepository.instance;
+    final repo = ExamRepository.instance;
 
     return SafeArea(
       child: ListView(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_exam_repository.dart';
+import '../data/exam_repository.dart';
 import '../models/app_models.dart';
 import '../navigation/app_section.dart';
 import 'exam_attempt_screen.dart';
@@ -16,12 +16,16 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final repo = MockExamRepository.instance;
+    final repo = ExamRepository.instance;
     const destinations = <AppSection>[
-      AppSection.exams,
-      AppSection.packages,
-      AppSection.gallery,
+      AppSection.profile,
       AppSection.courses,
+      AppSection.courses,
+      AppSection.courses,
+      AppSection.packages,
+      AppSection.exams,
+      AppSection.enquiries,
+      AppSection.menu,
     ];
 
     return FutureBuilder<List<SummaryStat>>(
@@ -158,7 +162,7 @@ class _ExamPreviewSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repo = MockExamRepository.instance;
+    final repo = ExamRepository.instance;
 
     return FutureBuilder<List<ExamCardData>>(
       future: repo.loadExams(),
@@ -230,7 +234,7 @@ class _AudioPracticeSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repo = MockExamRepository.instance;
+    final repo = ExamRepository.instance;
 
     return FutureBuilder<List<ExamCardData>>(
       future: repo.loadAudioExams(),

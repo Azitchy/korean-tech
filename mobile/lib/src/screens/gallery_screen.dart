@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_exam_repository.dart';
+import '../data/exam_repository.dart';
 import '../models/gallery_book.dart';
 import 'book_pdf_viewer_screen.dart';
 
@@ -9,7 +9,7 @@ class GalleryScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final repo = MockExamRepository.instance;
+    final repo = ExamRepository.instance;
     final scheme = Theme.of(context).colorScheme;
 
     return SafeArea(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../data/mock_exam_repository.dart';
+import '../data/exam_repository.dart';
 import '../models/app_models.dart';
 import '../widgets/section_card.dart';
 
@@ -17,7 +17,7 @@ class _EnquiriesScreenState extends State<EnquiriesScreen> {
   final _emailController = TextEditingController();
   final _subjectController = TextEditingController();
   final _messageController = TextEditingController();
-  final _repo = MockExamRepository.instance;
+  final _repo = ExamRepository.instance;
   bool _isSubmitting = false;
 
   @override
