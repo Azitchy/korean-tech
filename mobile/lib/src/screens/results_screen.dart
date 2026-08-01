@@ -17,18 +17,27 @@ class ResultsScreen extends StatelessWidget {
         children: [
           Text('Results & Performance', style: Theme.of(context).textTheme.headlineLarge),
           const SizedBox(height: 8),
-          Text('Track score history, accuracy, and weekly progress.'),
+          const Text('Track score history, accuracy, and weekly progress.'),
           const SizedBox(height: 18),
           FutureBuilder<List<ResultSnapshot>>(
             future: repo.loadResults(),
             builder: (context, snapshot) {
               final results = snapshot.data ?? const [];
+              if (results.isEmpty) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 24),
+                  child: Center(child: Text('No result data has been published yet.')),
+                );
+              }
+
               return Column(
                 children: results
-                    .map((result) => Padding(
-                          padding: const EdgeInsets.only(bottom: 14),
-                          child: _ResultCard(result: result),
-                        ))
+                    .map(
+                      (result) => Padding(
+                        padding: const EdgeInsets.only(bottom: 14),
+                        child: _ResultCard(result: result),
+                      ),
+                    )
                     .toList(),
               );
             },
@@ -40,29 +49,43 @@ class ResultsScreen extends StatelessWidget {
               future: repo.loadWeeklyProgress(),
               builder: (context, snapshot) {
                 final points = snapshot.data ?? const [];
+                if (points.isEmpty) {
+                  return const Text('No weekly progress has been published yet.');
+                }
+
                 return Wrap(
                   spacing: 8,
                   runSpacing: 12,
-                  children: points
-                      .map(
-                        (point) => _ProgressBar(point: point),
-                      )
-                      .toList(),
+                  children: points.map((point) => _ProgressBar(point: point)).toList(),
                 );
               },
             ),
           ),
           const SizedBox(height: 18),
-          const SectionCard(
+          SectionCard(
             title: 'Leaderboard Snapshot',
-            child: Column(
-              children: [
-                _LeaderboardRow(rank: 1, name: 'Aarav Shrestha', score: '98', subtitle: 'Fastest completion: 14:22'),
-                SizedBox(height: 10),
-                _LeaderboardRow(rank: 2, name: 'Sita Karki', score: '95', subtitle: 'Fastest completion: 15:08'),
-                SizedBox(height: 10),
-                _LeaderboardRow(rank: 3, name: 'Nabin Rai', score: '94', subtitle: 'Fastest completion: 15:41'),
-              ],
+            child: FutureBuilder(
+              future: repo.loadLeaderboard(),
+              builder: (context, snapshot) {
+                final entries = snapshot.data ?? const [];
+                if (entries.isEmpty) {
+                  return const Text('No leaderboard data has been published yet.');
+                }
+
+                return Column(
+                  children: entries.take(3).map((entry) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _LeaderboardRow(
+                        rank: entry.rank,
+                        name: entry.name,
+                        score: '${entry.score}',
+                        subtitle: 'Fastest completion: ${entry.fastestCompletion}',
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
           ),
         ],

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../data/mock_exam_repository.dart';
 import '../widgets/section_card.dart';
 
 class MenuScreen extends StatelessWidget {
@@ -7,6 +8,8 @@ class MenuScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final repo = MockExamRepository.instance;
+
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.all(16),
@@ -15,20 +18,27 @@ class MenuScreen extends StatelessWidget {
           const SizedBox(height: 8),
           const Text('Quick access to app tools and settings.'),
           const SizedBox(height: 18),
-          const SectionCard(
-            title: 'Shortcuts',
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              children: [
-                Chip(label: Text('Settings')),
-                Chip(label: Text('Language')),
-                Chip(label: Text('Dark Mode')),
-                Chip(label: Text('Downloads')),
-                Chip(label: Text('Certificates')),
-                Chip(label: Text('Support')),
-              ],
-            ),
+          FutureBuilder(
+            future: repo.loadMenuShortcuts(),
+            builder: (context, snapshot) {
+              final shortcuts = snapshot.data ?? const [];
+              return SectionCard(
+                title: 'Shortcuts',
+                child: Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: shortcuts.isEmpty
+                      ? const [Chip(label: Text('No shortcuts published yet'))]
+                      : shortcuts
+                          .map(
+                            (item) => Chip(
+                              label: Text(item.title),
+                            ),
+                          )
+                          .toList(),
+                ),
+              );
+            },
           ),
           const SizedBox(height: 18),
           const SectionCard(

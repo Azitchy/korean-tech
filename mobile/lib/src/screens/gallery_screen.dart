@@ -1,150 +1,77 @@
 import 'package:flutter/material.dart';
 
+import '../data/mock_exam_repository.dart';
 import '../models/gallery_book.dart';
 import 'book_pdf_viewer_screen.dart';
 
 class GalleryScreen extends StatelessWidget {
   const GalleryScreen({super.key});
 
-  static const List<GalleryBook> _books = [
-    GalleryBook(
-      title: 'Flutter Quick Start',
-      author: 'ExamVerse Studio',
-      summary: 'A beginner-friendly sample book for app onboarding and reading flow demo.',
-      category: 'Programming',
-      pages: 84,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFF5B8DEF),
-    ),
-    GalleryBook(
-      title: 'Practice Test Guide',
-      author: 'ExamVerse Studio',
-      summary: 'A short handbook that mirrors the exam preparation experience.',
-      category: 'Study Guide',
-      pages: 52,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFF00A8A8),
-    ),
-    GalleryBook(
-      title: 'Math Revision Notes',
-      author: 'ExamVerse Studio',
-      summary: 'Quick revision notes with a clean, readable layout for mobile viewing.',
-      category: 'Revision',
-      pages: 96,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFFEB7D34),
-    ),
-    GalleryBook(
-      title: 'Science Workbook',
-      author: 'ExamVerse Studio',
-      summary: 'A sample workbook used to demo book cover browsing and PDF preview.',
-      category: 'Workbook',
-      pages: 120,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFF7B61FF),
-    ),
-    GalleryBook(
-      title: 'English Grammar Tips',
-      author: 'ExamVerse Studio',
-      summary: 'Concise grammar examples with a document-style reading experience.',
-      category: 'Language',
-      pages: 68,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFFE84D8A),
-    ),
-    GalleryBook(
-      title: 'History Highlights',
-      author: 'ExamVerse Studio',
-      summary: 'A sample history book for testing vertical reading and zoom gestures.',
-      category: 'Reference',
-      pages: 74,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFF3AAFA9),
-    ),
-    GalleryBook(
-      title: 'Daily Quiz Planner',
-      author: 'ExamVerse Studio',
-      summary: 'Plan your daily preparation with this soft cover demo book.',
-      category: 'Planner',
-      pages: 40,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFF3F51B5),
-    ),
-    GalleryBook(
-      title: 'Admission Prep Notes',
-      author: 'ExamVerse Studio',
-      summary: 'A compact notes pack for admission test preparation and reading preview.',
-      category: 'Notes',
-      pages: 88,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFFDA627D),
-    ),
-    GalleryBook(
-      title: 'Computer Basics',
-      author: 'ExamVerse Studio',
-      summary: 'A visual sample for tech learners browsing books inside the gallery.',
-      category: 'Technology',
-      pages: 60,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFF2A9D8F),
-    ),
-    GalleryBook(
-      title: 'General Knowledge Deck',
-      author: 'ExamVerse Studio',
-      summary: 'A responsive book tile demo for a general knowledge PDF sample.',
-      category: 'Knowledge',
-      pages: 100,
-      assetPath: 'lib/src/assets/sample_book.pdf',
-      accent: Color(0xFFF4A261),
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final repo = MockExamRepository.instance;
     final scheme = Theme.of(context).colorScheme;
 
     return SafeArea(
       child: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _HeroBanner(onReadSample: () => _openBook(context, _books.first)),
-          const SizedBox(height: 18),
-          Text('Book Shelf', style: Theme.of(context).textTheme.headlineLarge),
-          const SizedBox(height: 6),
+          Text('Gallery', style: Theme.of(context).textTheme.headlineLarge),
+          const SizedBox(height: 8),
           Text(
-            'Browse 10 sample books and open any title in a read-only PDF viewer.',
+            'Browse PDF books and reading materials published from the backend.',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                   color: scheme.onSurfaceVariant,
                 ),
           ),
           const SizedBox(height: 18),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              final columns = constraints.maxWidth >= 1100
-                  ? 4
-                  : constraints.maxWidth >= 750
-                      ? 3
-                      : constraints.maxWidth >= 420
-                          ? 2
-                          : 1;
+          FutureBuilder<List<GalleryBook>>(
+            future: repo.loadGalleryBooks(),
+            builder: (context, snapshot) {
+              final books = snapshot.data ?? const <GalleryBook>[];
+              return Column(
+                children: [
+                  _HeroBanner(
+                    onReadSample: books.isEmpty ? null : () => _openBook(context, books.first),
+                  ),
+                  const SizedBox(height: 18),
+                  if (books.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: Text('No gallery items have been published yet.')),
+                    )
+                  else
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final columns = constraints.maxWidth >= 1100
+                            ? 4
+                            : constraints.maxWidth >= 750
+                                ? 3
+                                : constraints.maxWidth >= 420
+                                    ? 2
+                                    : 1;
 
-              return GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: _books.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: columns,
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  childAspectRatio: columns == 1 ? 1.22 : 0.92,
-                ),
-                itemBuilder: (context, index) {
-                  final book = _books[index];
-                  return _BookCard(
-                    book: book,
-                    onTap: () => _openBook(context, book),
-                  );
-                },
+                        return GridView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: books.length,
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: columns,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: columns == 1 ? 1.22 : 0.92,
+                          ),
+                          itemBuilder: (context, index) {
+                            final book = books[index];
+                            return _BookCard(
+                              book: book,
+                              onTap: () => _openBook(context, book),
+                            );
+                          },
+                        );
+                      },
+                    ),
+                ],
               );
             },
           ),
@@ -165,7 +92,7 @@ class GalleryScreen extends StatelessWidget {
 class _HeroBanner extends StatelessWidget {
   const _HeroBanner({required this.onReadSample});
 
-  final VoidCallback onReadSample;
+  final VoidCallback? onReadSample;
 
   @override
   Widget build(BuildContext context) {
@@ -184,80 +111,42 @@ class _HeroBanner extends StatelessWidget {
           end: Alignment.bottomRight,
         ),
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final stacked = constraints.maxWidth < 580;
-
-          final copy = Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Book Gallery',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.92),
-                      fontWeight: FontWeight.w700,
-                    ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'Read sample PDFs right inside the app',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w800,
-                    ),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                'The viewer is embedded without a download action, so users can read the file but stay inside the app experience.',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.white.withValues(alpha: 0.88),
-                    ),
-              ),
-              const SizedBox(height: 16),
-              FilledButton.icon(
-                onPressed: onReadSample,
-                icon: const Icon(Icons.menu_book_outlined),
-                label: const Text('Read sample PDF'),
-                style: FilledButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: scheme.primary,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Book Gallery',
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.92),
+                  fontWeight: FontWeight.w700,
                 ),
-              ),
-            ],
-          );
-
-          final artwork = Container(
-            width: stacked ? double.infinity : 220,
-            height: stacked ? 160 : 190,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.14),
-              borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: Colors.white.withValues(alpha: 0.18)),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Read backend-managed PDFs inside the app',
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            'Admins can publish new books from the dashboard and they will appear here automatically.',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  color: Colors.white.withValues(alpha: 0.88),
+                ),
+          ),
+          const SizedBox(height: 16),
+          FilledButton.icon(
+            onPressed: onReadSample,
+            icon: const Icon(Icons.menu_book_outlined),
+            label: const Text('Read sample PDF'),
+            style: FilledButton.styleFrom(
+              backgroundColor: Colors.white,
+              foregroundColor: scheme.primary,
             ),
-            child: const Center(
-              child: Icon(Icons.picture_as_pdf_outlined, color: Colors.white, size: 86),
-            ),
-          );
-
-          if (stacked) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                copy,
-                const SizedBox(height: 18),
-                artwork,
-              ],
-            );
-          }
-
-          return Row(
-            children: [
-              Expanded(child: copy),
-              const SizedBox(width: 20),
-              artwork,
-            ],
-          );
-        },
+          ),
+        ],
       ),
     );
   }

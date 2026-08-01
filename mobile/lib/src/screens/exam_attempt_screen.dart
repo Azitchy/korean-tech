@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../data/mock_exam_repository.dart';
 import '../models/app_models.dart';
 
 class ExamAttemptScreen extends StatefulWidget {
@@ -13,7 +14,7 @@ class ExamAttemptScreen extends StatefulWidget {
 }
 
 class ExamAttemptScreenState extends State<ExamAttemptScreen> {
-  late final List<ExamQuestion> _questions;
+  late final Future<ExamDetailData> _detailFuture;
   final Map<int, int> _answers = {};
   int _currentIndex = 0;
   bool _submitted = false;
@@ -21,7 +22,7 @@ class ExamAttemptScreenState extends State<ExamAttemptScreen> {
   @override
   void initState() {
     super.initState();
-    _questions = _buildDummyQuestions(widget.exam);
+    _detailFuture = MockExamRepository.instance.loadExamDetail(widget.exam.id);
   }
 
   void _selectAnswer(int optionIndex) {
@@ -30,8 +31,8 @@ class ExamAttemptScreenState extends State<ExamAttemptScreen> {
     });
   }
 
-  void _next() {
-    if (_currentIndex < _questions.length - 1) {
+  void _next(ExamDetailData detail) {
+    if (_currentIndex < detail.questions.length - 1) {
       setState(() => _currentIndex++);
     } else {
       setState(() => _submitted = true);
@@ -59,120 +60,152 @@ class ExamAttemptScreenState extends State<ExamAttemptScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_submitted) {
-      return ExamResultScreen(
-        exam: widget.exam,
-        questions: _questions,
-        answers: _answers,
-        onBackToExams: () => Navigator.of(context).pop(),
-      );
-    }
+    return FutureBuilder<ExamDetailData>(
+      future: _detailFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return _LoadingExam(title: widget.exam.title);
+        }
 
-    final question = _questions[_currentIndex];
-    final progress = (_currentIndex + 1) / _questions.length;
-    final selectedAnswer = _answers[_currentIndex];
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.exam.title),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              LinearProgressIndicator(value: progress),
-              const SizedBox(height: 12),
-              Text(
-                'Question ${_currentIndex + 1} of ${_questions.length}',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 18),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Text(
-                      question.prompt,
-                      style: Theme.of(context).textTheme.headlineSmall,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  IconButton.filledTonal(
-                    onPressed: _playQuestionSound,
-                    icon: const Icon(Icons.play_arrow_rounded),
-                    tooltip: 'Play sound',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 18),
-              Expanded(
-                child: ListView.separated(
-                  itemCount: question.options.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 12),
-                  itemBuilder: (context, index) {
-                    final option = question.options[index];
-                    final isSelected = selectedAnswer == index;
-
-                    return InkWell(
-                      borderRadius: BorderRadius.circular(18),
-                      onTap: () => _selectAnswer(index),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: isSelected
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.outlineVariant,
-                            width: isSelected ? 2 : 1,
-                          ),
-                          color: isSelected
-                              ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.08)
-                              : null,
-                        ),
-                        child: Row(
-                          children: [
-                            CircleAvatar(
-                              radius: 14,
-                              child: Text(option.label),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(child: Text(option.text)),
-                          ],
-                        ),
-                      ),
-                    );
-                  },
+        if (snapshot.hasError) {
+          return Scaffold(
+            appBar: AppBar(title: Text(widget.exam.title)),
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Unable to load exam questions.\n${snapshot.error}',
+                  textAlign: TextAlign.center,
                 ),
               ),
-              const SizedBox(height: 12),
-              Row(
+            ),
+          );
+        }
+
+        final detail = snapshot.data;
+        if (detail == null || detail.questions.isEmpty) {
+          return Scaffold(
+            appBar: AppBar(title: Text(widget.exam.title)),
+            body: const Center(child: Text('No questions have been published for this exam yet.')),
+          );
+        }
+
+        if (_submitted) {
+          return ExamResultScreen(
+            exam: detail.exam,
+            questions: detail.questions,
+            answers: _answers,
+            onBackToExams: () => Navigator.of(context).pop(),
+          );
+        }
+
+        final question = detail.questions[_currentIndex];
+        final progress = (_currentIndex + 1) / detail.questions.length;
+        final selectedAnswer = _answers[_currentIndex];
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(detail.exam.title),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ),
+          body: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  LinearProgressIndicator(value: progress),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Question ${_currentIndex + 1} of ${detail.questions.length}',
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  const SizedBox(height: 18),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          question.prompt,
+                          style: Theme.of(context).textTheme.headlineSmall,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      IconButton.filledTonal(
+                        onPressed: _playQuestionSound,
+                        icon: const Icon(Icons.play_arrow_rounded),
+                        tooltip: 'Play sound',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: _currentIndex == 0 ? null : _previous,
-                      child: const Text('Previous'),
+                    child: ListView.separated(
+                      itemCount: question.options.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final option = question.options[index];
+                        final isSelected = selectedAnswer == index;
+
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(18),
+                          onTap: () => _selectAnswer(index),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(18),
+                              border: Border.all(
+                                color: isSelected
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context).colorScheme.outlineVariant,
+                                width: isSelected ? 2 : 1,
+                              ),
+                              color: isSelected
+                                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.08)
+                                  : null,
+                            ),
+                            child: Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 14,
+                                  child: Text(option.label),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(child: Text(option.text)),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: FilledButton(
-                      onPressed: selectedAnswer == null ? null : _next,
-                      child: Text(_currentIndex == _questions.length - 1 ? 'Submit' : 'Next'),
-                    ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: _currentIndex == 0 ? null : _previous,
+                          child: const Text('Previous'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton(
+                          onPressed: selectedAnswer == null ? null : () => _next(detail),
+                          child: Text(_currentIndex == detail.questions.length - 1 ? 'Submit' : 'Next'),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
@@ -187,7 +220,7 @@ class ExamResultScreen extends StatelessWidget {
   });
 
   final ExamCardData exam;
-  final List<ExamQuestion> questions;
+  final List<ExamQuestionData> questions;
   final Map<int, int> answers;
   final VoidCallback onBackToExams;
 
@@ -249,6 +282,20 @@ class ExamResultScreen extends StatelessWidget {
   }
 }
 
+class _LoadingExam extends StatelessWidget {
+  const _LoadingExam({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text(title)),
+      body: const Center(child: CircularProgressIndicator()),
+    );
+  }
+}
+
 class _ResultRow extends StatelessWidget {
   const _ResultRow({required this.label, required this.value});
 
@@ -264,166 +311,4 @@ class _ResultRow extends StatelessWidget {
       ),
     );
   }
-}
-
-class ExamQuestion {
-  const ExamQuestion({
-    required this.prompt,
-    required this.options,
-  });
-
-  final String prompt;
-  final List<ExamOption> options;
-}
-
-class ExamOption {
-  const ExamOption({
-    required this.label,
-    required this.text,
-    required this.isCorrect,
-  });
-
-  final String label;
-  final String text;
-  final bool isCorrect;
-}
-
-List<ExamQuestion> _buildDummyQuestions(ExamCardData exam) {
-  return const [
-    ExamQuestion(
-      prompt: '안녕하세요?',
-      options: [
-        ExamOption(label: 'A', text: '안녕하세요.', isCorrect: true),
-        ExamOption(label: 'B', text: '감사합니다.', isCorrect: false),
-        ExamOption(label: 'C', text: '잘 가요.', isCorrect: false),
-        ExamOption(label: 'D', text: '실례합니다.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '이름이 뭐예요?',
-      options: [
-        ExamOption(label: 'A', text: '제 이름은 민수예요.', isCorrect: true),
-        ExamOption(label: 'B', text: '저는 네팔에서 왔어요.', isCorrect: false),
-        ExamOption(label: 'C', text: '오늘은 금요일이에요.', isCorrect: false),
-        ExamOption(label: 'D', text: '김치를 좋아해요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '어디에서 왔어요?',
-      options: [
-        ExamOption(label: 'A', text: '저는 네팔에서 왔어요.', isCorrect: true),
-        ExamOption(label: 'B', text: '저는 카트만두에 살아요.', isCorrect: false),
-        ExamOption(label: 'C', text: '제 취미는 음악 듣기예요.', isCorrect: false),
-        ExamOption(label: 'D', text: '한국어를 공부해요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '몇 살이에요?',
-      options: [
-        ExamOption(label: 'A', text: '저는 스무 살이에요.', isCorrect: true),
-        ExamOption(label: 'B', text: '지금 세 시예요.', isCorrect: false),
-        ExamOption(label: 'C', text: '오늘은 금요일이에요.', isCorrect: false),
-        ExamOption(label: 'D', text: '네, 조금 할 수 있어요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '한국어를 할 수 있어요?',
-      options: [
-        ExamOption(label: 'A', text: '네, 조금 할 수 있어요.', isCorrect: true),
-        ExamOption(label: 'B', text: '저는 네팔에서 왔어요.', isCorrect: false),
-        ExamOption(label: 'C', text: '날씨가 좋아요.', isCorrect: false),
-        ExamOption(label: 'D', text: '학교에 다녀요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '지금 몇 시예요?',
-      options: [
-        ExamOption(label: 'A', text: '지금 세 시예요.', isCorrect: true),
-        ExamOption(label: 'B', text: '오늘은 금요일이에요.', isCorrect: false),
-        ExamOption(label: 'C', text: '네, 좋아해요.', isCorrect: false),
-        ExamOption(label: 'D', text: '김치를 좋아해요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '오늘은 무슨 요일이에요?',
-      options: [
-        ExamOption(label: 'A', text: '오늘은 금요일이에요.', isCorrect: true),
-        ExamOption(label: 'B', text: '저는 스무 살이에요.', isCorrect: false),
-        ExamOption(label: 'C', text: '제 이름은 민수예요.', isCorrect: false),
-        ExamOption(label: 'D', text: '한국어를 공부해요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '좋아하는 음식이 뭐예요?',
-      options: [
-        ExamOption(label: 'A', text: '김치를 좋아해요.', isCorrect: true),
-        ExamOption(label: 'B', text: '제 취미는 음악 듣기예요.', isCorrect: false),
-        ExamOption(label: 'C', text: '학교에 다녀요.', isCorrect: false),
-        ExamOption(label: 'D', text: '날씨가 좋아요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '취미가 뭐예요?',
-      options: [
-        ExamOption(label: 'A', text: '제 취미는 음악 듣기예요.', isCorrect: true),
-        ExamOption(label: 'B', text: '저는 카트만두에 살아요.', isCorrect: false),
-        ExamOption(label: 'C', text: '네, 조금 할 수 있어요.', isCorrect: false),
-        ExamOption(label: 'D', text: '지금 세 시예요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '학교에 다녀요?',
-      options: [
-        ExamOption(label: 'A', text: '네, 학교에 다녀요.', isCorrect: true),
-        ExamOption(label: 'B', text: '저는 스무 살이에요.', isCorrect: false),
-        ExamOption(label: 'C', text: '오늘은 금요일이에요.', isCorrect: false),
-        ExamOption(label: 'D', text: '김치를 좋아해요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '어디에 살아요?',
-      options: [
-        ExamOption(label: 'A', text: '저는 카트만두에 살아요.', isCorrect: true),
-        ExamOption(label: 'B', text: '저는 네팔에서 왔어요.', isCorrect: false),
-        ExamOption(label: 'C', text: '학교에 다녀요.', isCorrect: false),
-        ExamOption(label: 'D', text: '안녕하세요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '날씨가 어때요?',
-      options: [
-        ExamOption(label: 'A', text: '날씨가 좋아요.', isCorrect: true),
-        ExamOption(label: 'B', text: '제 이름은 민수예요.', isCorrect: false),
-        ExamOption(label: 'C', text: '지금 세 시예요.', isCorrect: false),
-        ExamOption(label: 'D', text: '네, 조금 할 수 있어요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '무엇을 공부해요?',
-      options: [
-        ExamOption(label: 'A', text: '한국어를 공부해요.', isCorrect: true),
-        ExamOption(label: 'B', text: '김치를 좋아해요.', isCorrect: false),
-        ExamOption(label: 'C', text: '저는 스무 살이에요.', isCorrect: false),
-        ExamOption(label: 'D', text: '오늘은 금요일이에요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '커피를 좋아해요?',
-      options: [
-        ExamOption(label: 'A', text: '네, 좋아해요.', isCorrect: true),
-        ExamOption(label: 'B', text: '안녕하세요.', isCorrect: false),
-        ExamOption(label: 'C', text: '학교에 다녀요.', isCorrect: false),
-        ExamOption(label: 'D', text: '저는 카트만두에 살아요.', isCorrect: false),
-      ],
-    ),
-    ExamQuestion(
-      prompt: '만나서 반가워요.',
-      options: [
-        ExamOption(label: 'A', text: '저도 만나서 반가워요.', isCorrect: true),
-        ExamOption(label: 'B', text: '날씨가 좋아요.', isCorrect: false),
-        ExamOption(label: 'C', text: '제 취미는 음악 듣기예요.', isCorrect: false),
-        ExamOption(label: 'D', text: '한국어를 공부해요.', isCorrect: false),
-      ],
-    ),
-  ];
 }

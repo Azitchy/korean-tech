@@ -42,7 +42,13 @@ class _BookPdfViewerScreenState extends State<BookPdfViewerScreen> {
                     color: scheme.outlineVariant.withValues(alpha: 0.20),
                   ),
                 ),
-                child: _loadFailedDetails != null
+                child: widget.book.assetPath.isEmpty
+                    ? const _StatePanel(
+                        icon: Icons.picture_as_pdf_outlined,
+                        title: 'No PDF attached',
+                        message: 'This gallery item does not have an asset path yet.',
+                      )
+                    : _loadFailedDetails != null
                     ? _StatePanel(
                         icon: Icons.error_outline,
                         title: _loadFailedDetails!.error,
@@ -76,7 +82,7 @@ class _BookPdfViewerScreenState extends State<BookPdfViewerScreen> {
                 child: _StatePanel(
                   icon: Icons.picture_as_pdf_outlined,
                   title: 'Loading PDF',
-                  message: 'Please wait while the sample book is prepared for reading.',
+                  message: 'Please wait while the PDF is prepared for reading.',
                   loading: true,
                 ),
               ),

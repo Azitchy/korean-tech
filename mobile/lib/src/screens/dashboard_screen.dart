@@ -83,7 +83,7 @@ class DashboardScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 20),
                     _AudioPracticeSection(
-                      onViewMore: () => onNavigate(AppSection.exams),
+                      onViewMore: () => onNavigate(AppSection.audioPractice),
                     ),
                   ],
                 );
