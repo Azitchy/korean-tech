@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'dashboard_screen.dart';
@@ -15,6 +17,7 @@ import 'notifications_screen.dart';
 import 'packages_screen.dart';
 import 'profile_screen.dart';
 import 'results_screen.dart';
+import '../config/backend_config.dart';
 import '../navigation/app_section.dart';
 
 class HomeShell extends StatefulWidget {
@@ -24,9 +27,119 @@ class HomeShell extends StatefulWidget {
   State<HomeShell> createState() => _HomeShellState();
 }
 
-class _HomeShellState extends State<HomeShell> {
+class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
   AppSection _activeSection = AppSection.dashboard;
   AppSection _primaryTab = AppSection.dashboard;
+  int _refreshNonce = 0;
+  AppLifecycleState _lifecycleState = AppLifecycleState.resumed;
+  Timer? _refreshTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refreshTimer = Timer.periodic(const Duration(seconds: 45), (_) {
+      if (_lifecycleState == AppLifecycleState.resumed) {
+        _triggerRefresh();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _refreshTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _lifecycleState = state;
+    if (state == AppLifecycleState.resumed) {
+      _triggerRefresh();
+    }
+  }
+
+  void _triggerRefresh() {
+    if (!mounted) {
+      return;
+    }
+
+    setState(() {
+      _refreshNonce++;
+    });
+  }
+
+  Future<void> _showBackendSettings() async {
+    final controller = TextEditingController(text: BackendConfig.baseUrl);
+    try {
+      final action = await showDialog<_BackendAction>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text('Backend connection'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Enter the Laravel API base URL that your phone can reach. '
+                  'Example: http://192.168.1.20:8000/api/v1',
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: controller,
+                  decoration: const InputDecoration(
+                    labelText: 'Backend URL',
+                    border: OutlineInputBorder(),
+                  ),
+                  keyboardType: TextInputType.url,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Current value: ${BackendConfig.baseUrl}',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(_BackendAction.reset),
+                child: const Text('Use default'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pop(_BackendAction.save),
+                child: const Text('Save'),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      if (action == _BackendAction.reset) {
+        await BackendConfig.clearOverride();
+        _triggerRefresh();
+        return;
+      }
+
+      if (action == _BackendAction.save) {
+        await BackendConfig.setBaseUrl(controller.text);
+        _triggerRefresh();
+      }
+    } finally {
+      controller.dispose();
+    }
+  }
 
   void _openSection(AppSection section) {
     setState(() {
@@ -105,6 +218,18 @@ class _HomeShellState extends State<HomeShell> {
             tooltip: 'Open menu',
           ),
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.link_outlined),
+            tooltip: 'Set backend URL',
+            onPressed: _showBackendSettings,
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh_outlined),
+            tooltip: 'Sync backend data',
+            onPressed: _triggerRefresh,
+          ),
+        ],
       ),
       drawer: Drawer(
         width: drawerWidth,
@@ -210,7 +335,10 @@ class _HomeShellState extends State<HomeShell> {
       ),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 250),
-        child: _buildScreen(),
+        child: KeyedSubtree(
+          key: ValueKey('${_activeSection.name}-$_refreshNonce'),
+          child: _buildScreen(),
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _bottomIndex,
@@ -246,6 +374,8 @@ class _HomeShellState extends State<HomeShell> {
     );
   }
 }
+
+enum _BackendAction { save, reset }
 
 class _DrawerItem extends StatelessWidget {
   const _DrawerItem({

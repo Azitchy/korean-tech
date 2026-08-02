@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../data/exam_repository.dart';
+import '../config/backend_config.dart';
 import '../models/app_models.dart';
 import '../navigation/app_section.dart';
 import 'exam_attempt_screen.dart';
@@ -58,6 +59,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: FutureBuilder<DashboardSnapshot>(
           future: _dashboardFuture,
           builder: (context, snapshot) {
+            if (snapshot.hasError) {
+              return _DashboardErrorState(
+                error: snapshot.error,
+                backendUrl: BackendConfig.baseUrl,
+                onRetry: _refreshDashboard,
+              );
+            }
+
+            if (snapshot.connectionState != ConnectionState.done ||
+                !snapshot.hasData) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+
             final dashboard = snapshot.data;
             final stats = dashboard == null
                 ? const <SummaryStat>[]
@@ -207,6 +223,67 @@ class _DashboardScreenState extends State<DashboardScreen> {
         accent: const Color(0xFF8B5CF6),
       ),
     ];
+  }
+}
+
+class _DashboardErrorState extends StatelessWidget {
+  const _DashboardErrorState({
+    required this.error,
+    required this.backendUrl,
+    required this.onRetry,
+  });
+
+  final Object? error;
+  final String backendUrl;
+  final Future<void> Function() onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Card(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.cloud_off_outlined, color: scheme.error),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        'Backend connection failed',
+                        style: Theme.of(context).textTheme.titleLarge,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'The app could not load dashboard data from:\n$backendUrl',
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  error?.toString() ?? 'Unknown error',
+                  style: TextStyle(color: scheme.onSurfaceVariant),
+                ),
+                const SizedBox(height: 14),
+                FilledButton.icon(
+                  onPressed: () => onRetry(),
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Try again'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
 
